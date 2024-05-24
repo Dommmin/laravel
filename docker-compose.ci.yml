@@ -1,6 +1,6 @@
 version: "2.4"
 services:
-  api:
+  php:
     image: ${PHP_IMAGE}
     environment:
       - APP_NAME=laravel
