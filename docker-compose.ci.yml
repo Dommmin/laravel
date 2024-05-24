@@ -1,7 +1,7 @@
 version: "2.4"
 services:
   api:
-    image: ${API_IMAGE}
+    image: ${PHP_IMAGE}
     environment:
       - APP_NAME=laravel
       - APP_ENV=local
@@ -35,7 +35,7 @@ services:
       - MYSQL_ROOT_PASSWORD=secret
 
   migrate:
-    image: ${API_IMAGE}
+    image: ${PHP_IMAGE}
     environment:
       - APP_ENV=local
       - APP_KEY=base64:AH8NCjdy8jkyl8aHHZCa5Ox9bjJvo7yJDzG9DwmbLx8=
