@@ -60,7 +60,7 @@ jobs:
       - name: Run phpinsights
         run: |
           docker compose -f docker-compose.ci.yml up -d
-          docker compose -f docker-compose.ci.yml exec -T php artisan insights --no-interaction --min-quality=80 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
+          docker compose -f docker-compose.ci.yml exec -T php php artisan insights --no-interaction --min-quality=80 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
 
   test:
     needs: [ build-backend-images, build-mysql ]
@@ -80,7 +80,7 @@ jobs:
       - name: Run tests
         run: |
           docker compose -f docker-compose.ci.yml up -d
-          docker compose -f docker-compose.ci.yml exec -T php artisan test
+          docker compose -f docker-compose.ci.yml exec -T php php artisan test
 
   build-nginx:
     needs: [ analyze, test ]
