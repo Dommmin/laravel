@@ -6,13 +6,9 @@ on:
       - main
 
 env:
-  API_IMAGE: dommin/starter-api:${{ github.sha }}
-  SCHEDULER_IMAGE: dommin/starter-scheduler:${{ github.sha }}
-  WORKER_IMAGE: dommin/starter-worker:${{ github.sha }}
+  PHP_IMAGE: dommin/starter-php:${{ github.sha }}
   NGINX_IMAGE: dommin/starter-nginx:${{ github.sha }}
-  PROXY_IMAGE: dommin/starter-proxy:${{ github.sha }}
   MYSQL_IMAGE: dommin/starter-mysql:${{ github.sha }}
-  FRONTEND_IMAGE: dommin/starter-frontend:${{ github.sha }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
@@ -26,16 +22,12 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build images
         run: |
-          docker build -t $API_IMAGE --target=api --build-arg user=dominik --build-arg uid=1000 -f ./api/Dockerfile .
-          docker build -t $SCHEDULER_IMAGE --target=scheduler --build-arg user=dominik --build-arg uid=1000 -f ./api/Dockerfile .
-          docker build -t $WORKER_IMAGE --target=worker --build-arg user=dominik --build-arg uid=1000 -f ./api/Dockerfile .
+          docker build -t $PHP_IMAGE --build-arg user=dominik --build-arg uid=1000 -f ./.tools/docker/Dockerfile .
       - name: Install dependencies
-        run: docker run --rm -t $API_IMAGE composer install --prefer-dist --no-progress
+        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
       - name: Push images
         run: |
-          docker push $API_IMAGE
-          docker push $SCHEDULER_IMAGE
-          docker push $WORKER_IMAGE
+          docker push $PHP_IMAGE
 
   build-mysql:
     runs-on: ubuntu-latest
@@ -46,7 +38,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build MySQL image
-        run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./Dockerfile.mysql .
+        run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./.tools/docker/Dockerfile.mysql .
       - name: Push Mysql image
         run: docker push $MYSQL_IMAGE
 
@@ -59,16 +51,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Pull API image
-        run: docker pull $API_IMAGE
+      - name: Pull PHP image
+        run: docker pull $PHP_IMAGE
       - name: Pull MySQL image
         run: docker pull $MYSQL_IMAGE
       - name: Install dependencies
-        run: docker run --rm -t $API_IMAGE composer install --prefer-dist --no-progress
+        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
       - name: Run phpinsights
         run: |
           docker compose -f docker-compose.ci.yml up -d
-          docker compose -f docker-compose.ci.yml exec -T api php artisan insights --no-interaction --min-quality=80 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
+          docker compose -f docker-compose.ci.yml exec -T php artisan insights --no-interaction --min-quality=80 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
 
   test:
     needs: [ build-backend-images, build-mysql ]
@@ -79,16 +71,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Pull API image
-        run: docker pull $API_IMAGE
+      - name: Pull PHP image
+        run: docker pull $PHP_IMAGE
       - name: Pull MySQL image
         run: docker pull $MYSQL_IMAGE
       - name: Install dependencies
-        run: docker run --rm -t $API_IMAGE composer install --prefer-dist --no-progress
+        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
       - name: Run tests
         run: |
           docker compose -f docker-compose.ci.yml up -d
-          docker compose -f docker-compose.ci.yml exec -T api php artisan test
+          docker compose -f docker-compose.ci.yml exec -T php artisan test
 
   build-nginx:
     needs: [ analyze, test ]
