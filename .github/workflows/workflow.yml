@@ -26,6 +26,9 @@ jobs:
           docker build -t $PHP_IMAGE --build-arg user=dominik --build-arg uid=1000 -f ./.tools/docker/Dockerfile .
       - name: Install dependencies
         run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
+      - name: Build frontend image
+        run: |
+          docker build -t $PHP_IMAGE --target=build -f ./.tools/docker/Dockerfile .
       - name: Push images
         run: |
           docker push $PHP_IMAGE
@@ -113,7 +116,7 @@ jobs:
 
 
   deploy:
-    needs: [build-nginx]
+    needs: [ build-nginx, build-proxy ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -56,5 +56,11 @@ COPY . /usr/src
 # Install application dependencies
 RUN composer install --prefer-dist --no-progress
 
+# Install npm dependencies
+RUN npm install --no-progress
+
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
+
+FROM base as build
+RUN npm run build
