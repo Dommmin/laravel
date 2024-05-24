@@ -3,9 +3,20 @@ networks:
     driver: bridge
 
 services:
+  proxy:
+    image: dommin/starter-proxy:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - nginx
+    networks:
+      - laravel
+
   php:
     image: dommin/starter-php:${IMAGE_TAG}
-    container_name: ${DOCKER_PREFIX}_api
+    container_name: ${DOCKER_PREFIX}_php
     command: php-fpm
     restart: unless-stopped
     volumes:
