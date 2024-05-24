@@ -1,0 +1,53 @@
+networks:
+  laravel:
+    driver: bridge
+
+services:
+  php:
+    image: dommin/starter-php:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_api
+    command: php-fpm
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: storage
+        target: /usr/src/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - laravel
+
+  nginx:
+    image: dommin/starter-nginx:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_nginx
+    restart: unless-stopped
+    depends_on:
+      - php
+    networks:
+      - laravel
+
+  mysql:
+    image: dommin/starter-mysql:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_mysql
+    restart: unless-stopped
+    healthcheck:
+      test: mysql -h localhost -u root -p${DB_PASSWORD} -e 'SELECT version();'
+      start_period: 5s
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - type: volume
+        source: mysqldata
+        target: /var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    networks:
+      - laravel
+
+volumes:
+  storage:
+  mysqldata:
