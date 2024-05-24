@@ -1,4 +1,4 @@
-# Stage 1: Build the API image
+# Stage 1: Build the PHP image
 FROM php:8.2-fpm-alpine as base
 
 # Set working directory
@@ -39,9 +39,6 @@ RUN pecl install redis xdebug imagick swoole
 # Install Node.js and npm
 RUN apk add --no-cache nodejs npm
 
-# Enable imagick PHP extension
-RUN docker-php-ext-enable imagick
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -58,6 +55,7 @@ RUN composer install --prefer-dist --no-progress
 
 # Install npm dependencies
 RUN npm install
+RUN npm run build
 
 # Change ownership and permissions
 RUN chown -R www-data:www-data /usr/src && \
@@ -65,3 +63,6 @@ RUN chown -R www-data:www-data /usr/src && \
 
 FROM base as build
 RUN npm run build
+
+FROM base as prod
+COPY --from=build /usr/src/public /usr/share/nginx/html
