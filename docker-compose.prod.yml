@@ -36,6 +36,10 @@ services:
     image: dommin/starter-nginx:${IMAGE_TAG}
     container_name: ${DOCKER_PREFIX}_nginx
     restart: unless-stopped
+    volumes:
+      - type: volume
+        source: public
+        target: /usr/src/public
     depends_on:
       - php
     networks:
@@ -63,3 +67,4 @@ services:
 volumes:
   storage:
   mysqldata:
+  public:

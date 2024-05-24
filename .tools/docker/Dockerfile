@@ -30,7 +30,7 @@ RUN apk update && apk add --no-cache \
     imagemagick-dev \
     libtool
 
-# Install PHP extensions \
+# Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 # Install PHP PECL extensions
@@ -59,9 +59,15 @@ RUN composer install --prefer-dist --no-progress
 # Install npm dependencies
 RUN npm install
 
+# Change ownership and permissions
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
 FROM base as build
-RUN npm install
+
+# Run npm build process
 RUN npm run build
+
+# Copy build output to a separate directory
+RUN mkdir -p /usr/src/public/build
+RUN cp -r /usr/src/build/* /usr/src/public/build/
