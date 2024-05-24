@@ -53,5 +53,8 @@ COPY ./.tools/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./migration.sh ./
 COPY . /usr/src
 
+# Install application dependencies
+RUN composer install --prefer-dist --no-progress
+
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
