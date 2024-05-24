@@ -93,7 +93,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build nginx image
         run: |
-          docker build -t $NGINX_IMAGE -f ./Dockerfile.nginx .
+          docker build -t $NGINX_IMAGE -f ./.tools/docker/Dockerfile.nginx .
           docker push $NGINX_IMAGE
 
   deploy:
