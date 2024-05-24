@@ -1,5 +1,5 @@
 # Stage 1: Build the API image
-FROM php:8.2-fpm-alpine as api
+FROM php:8.2-fpm-alpine as base
 
 # Set working directory
 WORKDIR /usr/src
@@ -57,10 +57,11 @@ COPY . /usr/src
 RUN composer install --prefer-dist --no-progress
 
 # Install npm dependencies
-RUN npm install --no-progress
+RUN npm install
 
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
 FROM base as build
+RUN npm install
 RUN npm run build
