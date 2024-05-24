@@ -83,7 +83,7 @@ jobs:
 #          docker compose -f docker-compose.ci.yml exec -T php php artisan test
 
   build-nginx:
-    needs: [ analyze, test ]
+    needs: [ analyze ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
