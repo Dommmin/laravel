@@ -101,12 +101,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Copy files to remote server
+        run: |
+          sshpass -p ${{ secrets.DIGITALOCEAN_SSH_PASSWORD }} scp -o StrictHostKeyChecking=no deploy.sh docker-compose.prod.yml root@${{ secrets.DROPLET_IP }}:/root/
       - name: Run deploy script on remote server
         run: |
           sshpass -p ${{ secrets.DIGITALOCEAN_SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP }} << 'EOF'
-          cd /root
           sed -i "/IMAGE_TAG/c\IMAGE_TAG=${{ github.sha }}" /root/.env
-          chmod +x deploy.sh
-          ./deploy.sh
+          chmod +x /root/deploy.sh
+          /root/deploy.sh
           exit
           EOF
