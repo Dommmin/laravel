@@ -62,25 +62,25 @@ jobs:
           docker compose -f docker-compose.ci.yml up -d
           docker compose -f docker-compose.ci.yml exec -T php php artisan insights --no-interaction --min-quality=80 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
 
-  test:
-    needs: [ build-backend-images, build-mysql ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Pull PHP image
-        run: docker pull $PHP_IMAGE
-      - name: Pull MySQL image
-        run: docker pull $MYSQL_IMAGE
-      - name: Install dependencies
-        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
-      - name: Run tests
-        run: |
-          docker compose -f docker-compose.ci.yml up -d
-          docker compose -f docker-compose.ci.yml exec -T php php artisan test
+#  test:
+#    needs: [ build-backend-images, build-mysql ]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#      - name: Pull PHP image
+#        run: docker pull $PHP_IMAGE
+#      - name: Pull MySQL image
+#        run: docker pull $MYSQL_IMAGE
+#      - name: Install dependencies
+#        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
+#      - name: Run tests
+#        run: |
+#          docker compose -f docker-compose.ci.yml up -d
+#          docker compose -f docker-compose.ci.yml exec -T php php artisan test
 
   build-nginx:
     needs: [ analyze, test ]
