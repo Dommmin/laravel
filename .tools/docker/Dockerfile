@@ -64,10 +64,4 @@ RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
 FROM base as build
-
-# Run npm build process
 RUN npm run build
-
-# Copy build output to a separate directory
-RUN mkdir -p /usr/src/public/build
-RUN cp -r /usr/src/build/* /usr/src/public/build/
