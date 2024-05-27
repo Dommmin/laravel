@@ -49,7 +49,7 @@ COPY ./.tools/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY . .
 
 # Install application dependencies
-RUN composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+RUN composer install --prefer-dist --no-scripts --no-progress --no-suggest --optimize-autoloader
 
 # Build assets
 RUN npm install && npm run build

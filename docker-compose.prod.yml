@@ -6,8 +6,6 @@ services:
     container_name: ${DOCKER_PREFIX}_nginx
     ports:
       - "80:80"
-    volumes:
-      - ./public:/usr/src/public:ro  # read-only
     depends_on:
       - php
 
