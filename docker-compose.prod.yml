@@ -3,6 +3,7 @@ version: '3.8'
 services:
   nginx:
     image: dommin/starter-nginx:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_nginx
     ports:
       - "80:80"
     volumes:
@@ -13,13 +14,29 @@ services:
   php:
     image: dommin/starter-php:${IMAGE_TAG}
     volumes:
-      - .:/var/www/html
+     - type: volume
+       source: storage
+       target: /usr/src/storage
+     - /root/.env:/usr/src/.env
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
+    env_file:
+      - /root/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: dommin/starter-mysql:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_mysql
+    restart: unless-stopped
+    healthcheck:
+      test: mysql -h localhost -u root -p${DB_PASSWORD} -e 'SELECT version();'
+      start_period: 5s
+      interval: 15s
+      timeout: 5s
+      retries: 5
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
