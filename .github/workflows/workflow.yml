@@ -17,10 +17,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build assets
+        run: npm run build
+
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build backend images
         run: |
           docker build -t $PHP_IMAGE --target=prod -f ./.tools/docker/Dockerfile .
@@ -36,7 +49,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build MySQL image
         run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./.tools/docker/Dockerfile.mysql .
-      - name: Push Mysql image
+      - name: Push MySQL image
         run: docker push $MYSQL_IMAGE
 
   analyze:
@@ -59,28 +72,28 @@ jobs:
           docker compose -f docker-compose.ci.yml up -d
           docker compose -f docker-compose.ci.yml exec -T php php artisan insights --no-interaction --min-quality=80 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
 
-#  test:
-#    needs: [ build-backend-images, build-mysql ]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: docker/login-action@v3
-#        with:
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKER_PASSWORD }}
-#      - name: Pull PHP image
-#        run: docker pull $PHP_IMAGE
-#      - name: Pull MySQL image
-#        run: docker pull $MYSQL_IMAGE
-#      - name: Install dependencies
-#        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
-#      - name: Run tests
-#        run: |
-#          docker compose -f docker-compose.ci.yml up -d
-#          docker compose -f docker-compose.ci.yml exec -T php php artisan test
+  #  test:
+  #    needs: [ build-backend-images, build-mysql ]
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - uses: actions/checkout@v4
+  #      - uses: docker/login-action@v3
+  #        with:
+  #          username: ${{ secrets.DOCKER_USERNAME }}
+  #          password: ${{ secrets.DOCKER_PASSWORD }}
+  #      - name: Pull PHP image
+  #        run: docker pull $PHP_IMAGE
+  #      - name: Pull MySQL image
+  #        run: docker pull $MYSQL_IMAGE
+  #      - name: Install dependencies
+  #        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
+  #      - name: Run tests
+  #        run: |
+  #          docker compose -f docker-compose.ci.yml up -d
+  #          docker compose -f docker-compose.ci.yml exec -T php php artisan test
 
   build-nginx:
-    needs: [ analyze ]
+    needs: [analyze]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,7 +107,7 @@ jobs:
           docker push $NGINX_IMAGE
 
   build-proxy:
-    needs: [ analyze ]
+    needs: [analyze]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -107,9 +120,8 @@ jobs:
           docker build -t $PROXY_IMAGE -f ./.tools/docker/Dockerfile.proxy .
           docker push $PROXY_IMAGE
 
-
   deploy:
-    needs: [ build-nginx, build-proxy ]
+    needs: [build-nginx, build-proxy]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

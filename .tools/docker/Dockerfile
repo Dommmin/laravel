@@ -13,7 +13,7 @@ RUN apk update && apk add --no-cache \
     pcre-dev \
     zlib-dev \
     file \
-    bash  \
+    bash \
     linux-headers \
     git \
     curl \
@@ -28,16 +28,15 @@ RUN apk update && apk add --no-cache \
     supervisor \
     mysql-client \
     imagemagick-dev \
-    libtool
+    libtool \
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 # Install PHP PECL extensions
 RUN pecl install redis xdebug imagick swoole
-
-# Install Node.js and npm
-RUN apk add --no-cache nodejs npm
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -47,13 +46,12 @@ COPY ./.tools/php-fpm/php-prod.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./.tools/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Copy application files
-COPY ./migration.sh ./
 COPY . /usr/src
 
 # Install application dependencies
 RUN composer install --prefer-dist --no-progress
 
-# Install npm dependencies
+# Build assets
 RUN npm install
 RUN npm run build
 
@@ -61,8 +59,10 @@ RUN npm run build
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
-FROM base as build
-RUN npm run build
+# Stage 2: Production image
+FROM php:8.2-fpm-alpine as prod
 
-FROM base as prod
-COPY --from=build /usr/src/public /usr/share/nginx/html
+COPY --from=base /usr/src /var/www/html
+
+# Ensure built assets are included
+COPY --from=base /usr/src/public/build /var/www/html/public/build
