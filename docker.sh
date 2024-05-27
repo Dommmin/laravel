@@ -94,4 +94,4 @@ docker exec -it "$DOCKER_PREFIX"_php php artisan insights --fix -n
 
 # Panel
 echo "${BOLD}${RED}--------------------------------------------------------------------------------${RESET}"
-echo "${YELLOW}Strona jest dostępne pod adresem: ${BOLD}${GREEN}http://localhost:8000${RESET}"
+echo "${YELLOW}Strona jest dostępne pod adresem: ${BOLD}${GREEN}http://localhost:80${RESET}"

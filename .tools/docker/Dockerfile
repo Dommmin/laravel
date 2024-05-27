@@ -49,7 +49,7 @@ COPY ./.tools/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY . .
 
 # Install application dependencies
-RUN composer install --prefer-dist --no-progress
+RUN composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
 
 # Build assets
 RUN npm install && npm run build
@@ -57,4 +57,3 @@ RUN npm install && npm run build
 # Change ownership and permissions
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
-
