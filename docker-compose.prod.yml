@@ -4,6 +4,9 @@ services:
   nginx:
     image: dommin/starter-nginx:${IMAGE_TAG}
     container_name: ${DOCKER_PREFIX}_nginx
+    command: sh -c "nginx -g \"daemon off;\""
+    volumes:
+      - ./public:/usr/src/public
     ports:
       - "80:80"
     depends_on:
@@ -13,6 +16,7 @@ services:
     image: dommin/starter-php:${IMAGE_TAG}
     container_name: ${DOCKER_PREFIX}_php
     volumes:
+      - /root/public:/usr/src/public
       - /root/.env:/usr/src/.env:ro
     environment:
       - APP_ENV=production
