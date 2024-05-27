@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   nginx:
     image: dommin/starter-nginx:${IMAGE_TAG}
@@ -16,13 +14,13 @@ services:
     image: dommin/starter-php:${IMAGE_TAG}
     container_name: ${DOCKER_PREFIX}_php
     volumes:
-      - /root/public:/usr/src/public
-      - /root/.env:/usr/src/.env:ro
+      - ./public:/usr/src/public
+      - ./.env:/usr/src/.env:ro
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
     env_file:
-      - /root/.env
+      - ./.env
     depends_on:
       mysql:
         condition: service_healthy
