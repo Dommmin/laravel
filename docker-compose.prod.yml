@@ -14,9 +14,9 @@ services:
   php:
     image: dommin/starter-php:${IMAGE_TAG}
     volumes:
-     - type: volume
-       source: storage
-       target: /usr/src/storage
+#     - type: volume
+#       source: storage
+#       target: /usr/src/storage
      - /root/.env:/usr/src/.env
     environment:
       - APP_ENV=production
