@@ -1,17 +1,17 @@
 services:
-    proxy:
-        build:
-            context: .
-            dockerfile: ./.tools/docker/Dockerfile.proxy
-        restart: unless-stopped
-        ports:
-            - "80:80"
-        volumes:
-            - ./.tools/proxy.conf:/etc/nginx/nginx.conf
-        depends_on:
-            - nginx
-        networks:
-            - laravel
+#    proxy:
+#        build:
+#            context: .
+#            dockerfile: ./.tools/docker/Dockerfile.proxy
+#        restart: unless-stopped
+#        ports:
+#            - "80:80"
+#        volumes:
+#            - ./.tools/proxy.conf:/etc/nginx/nginx.conf
+#        depends_on:
+#            - nginx
+#        networks:
+#            - laravel
 
     php:
         container_name: ${DOCKER_PREFIX}_php
@@ -20,7 +20,6 @@ services:
             dockerfile: .tools/docker/Dockerfile
             target: base
         restart: unless-stopped
-#        command: sh -c "php artisan serve --host=0.0.0.0 --port=8000"
         volumes:
             - ./:/usr/src
             - ./.tools/php-fpm/php-dev.ini:/usr/local/etc/php/conf.d/php.ini
@@ -65,6 +64,8 @@ services:
             - ./.tools/nginx.conf:/etc/nginx/nginx.conf
         depends_on:
             - php
+        ports:
+            -   "80:80"
         networks:
             - laravel
 
