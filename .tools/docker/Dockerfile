@@ -52,8 +52,7 @@ COPY . /usr/src
 RUN composer install --prefer-dist --no-progress
 
 # Build assets
-RUN npm install
-RUN npm run build
+RUN npm install && npm run build
 
 # Change ownership and permissions
 RUN chown -R www-data:www-data /usr/src && \
@@ -62,7 +61,4 @@ RUN chown -R www-data:www-data /usr/src && \
 # Stage 2: Production image
 FROM php:8.2-fpm-alpine as prod
 
-COPY --from=base /usr/src /var/www/html
-
-# Ensure built assets are included
-COPY --from=base /usr/src/public/build /var/www/html/public/build
+COPY --from=base /usr/src /usr/src
