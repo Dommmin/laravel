@@ -46,7 +46,7 @@ COPY ./.tools/php-fpm/php-prod.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./.tools/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Copy application files
-COPY . /usr/src
+COPY . .
 
 # Install application dependencies
 RUN composer install --prefer-dist --no-progress
@@ -58,7 +58,3 @@ RUN npm install && npm run build
 RUN chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
-# Stage 2: Production image
-FROM php:8.2-fpm-alpine as prod
-
-COPY --from=base /usr/src /usr/src

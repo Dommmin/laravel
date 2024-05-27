@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build images
-        run: docker build -t $PHP_IMAGE -f ./.tools/docker/Dockerfile .
+        run: docker build -t $PHP_IMAGE --target=base -f ./.tools/docker/Dockerfile .
       - name: Install dependencies
         run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
       - uses: actions/setup-node@v4
