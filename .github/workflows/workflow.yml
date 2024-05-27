@@ -24,12 +24,10 @@ jobs:
       - name: Build images
         run: docker build -t $PHP_IMAGE --target=base -f ./.tools/docker/Dockerfile .
       - name: Install dependencies
-        run: docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress
-      - uses: actions/setup-node@v4
-      - name: Build assets
         run: |
-          npm install
-          npm run build
+          docker run --rm -t $PHP_IMAGE composer install --prefer-dist --no-progress --no-interaction
+          docker run --rm -t $PHP_IMAGE npm install --no-progress
+          docker run --rm -t $PHP_IMAGE npm run build --no-progress
       - name: Push image
         run: docker push $PHP_IMAGE
 
