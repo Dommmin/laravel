@@ -1,12 +1,19 @@
 services:
+  proxy:
+    image: dommin/starter-proxy:${IMAGE_TAG}
+    container_name: ${DOCKER_PREFIX}_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - nginx
+
   nginx:
     image: dommin/starter-nginx:${IMAGE_TAG}
     container_name: ${DOCKER_PREFIX}_nginx
     command: sh -c "nginx -g \"daemon off;\""
     volumes:
       - ./public:/usr/src/public
-    ports:
-      - "80:80"
     depends_on:
       - php
 
